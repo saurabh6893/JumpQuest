@@ -1,6 +1,6 @@
 .character {
   width: 60px;
-  height: 100px;
+  height: 85px;
   background-color: red;
   position: absolute;
 }
@@ -15,5 +15,6 @@
 .grid {
   height: 600px;
   width: 400px;
+  position: relative;
   background-color: blue;
 }
