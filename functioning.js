@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let score = 0
   let isGoingLeft = false
   let isGoingRight = false
+  let speed = 30
 
   let leftTimerId
   let rightTimerId
@@ -22,12 +23,16 @@ document.addEventListener('DOMContentLoaded', () => {
     charLeft = platforms[0].left
     character.style.left = charLeft + 'px'
     character.style.bottom = charBottom + 'px'
+    setInterval(function () {
+      character.classList.toggle('alpha')
+    }, 1000)
   }
 
   class Platform {
     constructor(newPlatBottom) {
       this.bottom = newPlatBottom
       this.left = Math.random() * 315
+
       this.visual = document.createElement('div')
 
       const visual = this.visual
@@ -60,6 +65,8 @@ document.addEventListener('DOMContentLoaded', () => {
           firstPlatform.classList.remove('platform')
           platforms.shift()
           score++
+          character.innerHTML = score
+          scoreTest()
           let newPlat = new Platform(600)
           platforms.push(newPlat)
         }
@@ -67,16 +74,31 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  function scoreTest() {
+    if (score >= 30 && score < 60) {
+      speed = 20
+      grid.classList.add('hard')
+    } else if (score >= 60) {
+      speed = 10
+      grid.classList.remove('hard')
+      grid.classList.add('veryhard')
+    } else speed = 30
+  }
+
   function jump() {
     clearInterval(downTimeId)
     isJumping = true
     upTimeId = setInterval(function () {
-      charBottom += 20
+      charBottom += 5
       character.style.bottom = charBottom + 'px'
       if (charBottom > startPoint + 200) {
         fall()
       }
-    }, 30)
+      if (charBottom > 530) {
+        charBottom -= 10
+        fall()
+      }
+    }, speed)
   }
   function fall() {
     clearInterval(upTimeId)
@@ -100,7 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
           jump()
         }
       })
-    }, 30)
+    }, speed)
   }
 
   function gameOver() {
@@ -110,7 +132,8 @@ document.addEventListener('DOMContentLoaded', () => {
     while (grid.firstChild) {
       grid.removeChild(grid.firstChild)
     }
-    grid.innerHTML = score
+    grid.classList.add('gameover')
+    grid.innerHTML = `Score is ${score}` + '<br />' + '<span>Game Over</span>'
     clearInterval(upTimeId)
     clearInterval(downTimeId)
     clearInterval(leftTimerId)
@@ -125,6 +148,7 @@ document.addEventListener('DOMContentLoaded', () => {
     } else if (e.key === 'ArrowUp') {
       moveStraight()
     } else if (e.key === 'ArrowDown') {
+      moveDown()
     }
   }
 
@@ -141,7 +165,7 @@ document.addEventListener('DOMContentLoaded', () => {
       } else {
         movingRight()
       }
-    }, 30)
+    }, speed)
   }
 
   function movingRight() {
@@ -157,7 +181,15 @@ document.addEventListener('DOMContentLoaded', () => {
       } else {
         movingLeft()
       }
-    }, 30)
+    }, speed)
+  }
+
+  function moveDown() {
+    isGoingRight = false
+    isGoingLeft = false
+    clearInterval(rightTimerId)
+    clearInterval(leftTimerId)
+    charBottom -= 5
   }
 
   function moveStraight() {
@@ -169,6 +201,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function Start() {
     if (!isGameOver) {
+      grid.classList.remove('gameover')
       createPlaforms()
       buildCharacter()
       setInterval(movePlatform, 30)
